@@ -1,5 +1,5 @@
 import pystk
-
+import math
 
 def control(aim_point, current_vel):
     """
@@ -17,6 +17,36 @@ def control(aim_point, current_vel):
     Hint: Use action.steer to turn the kart towards the aim_point, clip the steer angle to -1..1
     Hint: You may want to use action.drift=True for wide turns (it will turn faster)
     """
+
+    target = 40
+    if current_vel > target:
+      action.acceleration = 0
+      action.brake = True
+    else:
+      action.acceleration = -1 * ((current_vel - target) / target)
+      action.brake = False
+
+    angle = ((math.atan2(aim_point[1], aim_point[0]) * 180) / math.pi) + 90
+    if angle < 0:
+      angle = angle + 360
+
+    if angle >= 0 and angle <= 180:
+      dir = angle / 180
+    else:
+      dir = ((angle - 180) / 180) - 1
+
+    action.steer = dir
+
+    if -0.005 < dir < 0.005:
+      action.nitro = True
+      action.brake = False
+    else:
+      action.nitro = False
+
+    if dir < -0.3 or dir > 0.3:
+      action.drift = True
+    else:
+      action.drift = False
 
     return action
 
